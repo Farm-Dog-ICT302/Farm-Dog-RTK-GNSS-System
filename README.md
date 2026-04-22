@@ -41,3 +41,10 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - farmdog.py (this program introduce as solution)
     - PyGPSClient (graphical monitoring)
     - Raspberry Pi OS
+
+## Versions
+
+### farmdog.py (v1.0) - Initial Release Prototype
+    - this program connects directly to the ZED-F9P serial port.
+    - proven working with real RTK Fixed data base on equation provided.
+

@@ -48,7 +48,6 @@ FIX_DESCRIPTION = {
     0: 'No Fix',
     1: 'GPS Fix',
     2: 'DGPS',
-    3: 'GNSS + Dead Reckoning',
     4: 'RTK FIXED',
     5: 'RTK FLOAT',
     6: 'Estimated (dead reckoning)',

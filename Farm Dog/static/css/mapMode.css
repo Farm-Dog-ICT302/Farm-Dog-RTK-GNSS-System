@@ -1,0 +1,32 @@
+#mainContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width:80%;
+}
+
+#return {
+    text-align:center;
+    background-color:var(--bg-color);
+    color:var(--text-color);
+    font-size:2vw;
+}
+
+.mapModeDataDisplay {
+    color:var(--text-color);
+    text-align:center;
+    font-size:20px;
+    padding-right: 10%;
+    padding-left: 10%;
+    width:100%;
+}
+
+.mapModeDataLabel {
+    font-weight:bold;
+}
+
+.mapModeDataValue {
+    border: 2px solid var(--text-color);
+}
+

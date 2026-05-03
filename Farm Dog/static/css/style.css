@@ -1,0 +1,69 @@
+:root {
+    --bg-color: white;
+    --text-color: black;
+}
+
+[data-theme='dark'] {
+    --bg-color: black;
+    --text-color: white;
+}
+
+body{
+    background-color: var(--bg-color);
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width:100%;
+}
+
+#titleDiv {
+    color: var(--text-color);
+    text-align:center;
+    font-size:4vw;
+}
+
+.standardSeparator {
+    height: 10px;
+}
+
+#contentTitle {
+    color: var(--text-color);
+    text-align:center;
+    font-size:3vw;
+}
+
+#menuDiv {
+    position: fixed;
+    top: 5%;
+    left:5%;
+    color:var(--text-color);
+    background-color: var(--bg-color);
+    z-index: 1000;
+    border: 2px solid var(--text-color);
+}
+
+#menuButton {
+    background-color:var(--bg-color);
+    color:var(--text-color);
+}
+
+#darkModeToggle {
+    color:var(--text-color);
+    font-weight:bold;
+}
+
+#showHideLabel {
+    font-weight:bold;
+}
+
+#CSVButtonDiv {
+    text-align:center;
+}
+
+#CSVButton {
+    background-color:var(--bg-color);
+    color:var(--text-color);
+    text-align:center;
+    font-size:40px;
+}

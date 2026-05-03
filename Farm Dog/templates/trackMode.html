@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Compass to Target</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/trackMode.css') }}">
+    </head>
+    <body>
+        <button id="return">Return to Main Menu</button>
+            <div id="longitude" class = "trackModeDataDisplay">
+                <div id = "longitudeLabel" class = "trackModeDataLabel">
+                    Longditude
+                </div>
+                <div id = "longitudeValue" class = "trackModeDataValue">
+                    0.0°
+                </div>
+                </div>
+            <div id="latitude" class = "trackModeDataDisplay">
+                <div id = "latitudeLabel" class = "trackModeDataLabel">
+                    Latitude
+                </div>
+                <div id = "latitudeValue" class = "trackModeDataValue">
+                    0.0°
+                </div>
+            </div>
+            <div id="distance" class = "trackModeDataDisplay">
+                <div id = "distanceLabel" class = "trackModeDataLabel">
+                    Altitude
+                </div>
+                <div id = "distanceValue" class = "trackModeDataValue">
+                    0.0 meters
+                </div>
+            </div>
+
+
+
+
+
+                $("#distanceValue").html((data.distance/1000)).toFixed(2) + "meters";
+        <div id = "compassBox">
+            <div id = "compass">
+                <div id = "arrow">
+                </div>
+            </div>
+        </div>
+
+        <div id="targetLat+Lon" class = "trackModeDataDisplay">
+            <div id = "targetLatLabel" class = "trackModeDataLabel">
+                Target Lat: <input id = "targetLat" value = "0.00" />
+            </div>
+            <div id = "TargetLonLabel" class = "trackModeDataLabel">
+                Target Lon: <input id = "targetLon" value = "0.00" />
+            </div>
+        </div>
+        <script src="{{ url_for('static', filename='js/trackMode.js') }}"></script>
+    </body>
+</html>

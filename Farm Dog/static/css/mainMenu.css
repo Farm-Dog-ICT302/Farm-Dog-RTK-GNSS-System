@@ -1,0 +1,17 @@
+#buttonBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modeExplanation {
+    font-size: 2vw;
+    color: var(--text-color);
+}
+
+.mainMenuButton {
+    font-size: 2vw;
+    color: var(--text-color);
+    background-color:var(--bg-color);
+}

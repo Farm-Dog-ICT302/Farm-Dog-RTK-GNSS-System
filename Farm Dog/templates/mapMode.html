@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/mapMode.css') }}">
+        <script src="{{ url_for('static', filename='js/mapMode.js') }}"></script>
+    </head>
+    <body>
+        <button id="return">Return to Main Menu</button>
+        <div id="longitude" class = "mapModeDataDisplay">
+            <div id = "longitudeLabel" class = "mapModeDataLabel">
+                Longditude
+            </div>
+            <div id = "longitudeValue" class = "mapModeDataValue">
+                0.0°
+            </div>
+            </div>
+        <div id="latitude" class = "mapModeDataDisplay">
+            <div id = "latitudeLabel" class = "mapModeDataLabel">
+                Latitude
+            </div>
+            <div id = "latitudeValue" class = "mapModeDataValue">
+                0.0°
+            </div>
+        </div>
+        <div id="altitude" class = "mapModeDataDisplay">
+            <div id = "altitudeLabel" class = "mapModeDataLabel">
+                Altitude
+            </div>
+            <div id = "altitudeValue" class = "mapModeDataValue">
+                0.0 meters
+            </div>
+        </div>
+        <div id="accuracy" class = "mapModeDataDisplay">
+            <div id = "accuracyLabel" class = "mapModeDataLabel">
+                GPS Accuracy
+            </div>
+            <div id = "accuracyValue" class = "mapModeDataValue">
+                0.0 mm
+            </div>
+        </div>
+        <div id="RTKFix" class = "mapModeDataDisplay">
+            <div id = "RTKFixLabel" class = "mapModeDataLabel">
+                RTK Fix Status
+            </div>
+            <div id = "RTKFixValue" class = "mapModeDataValue">
+                Fixed
+            </div>
+        </div>
+        <div id="sattelites" class = "mapModeDataDisplay">
+            <div id = "sattelitesLabel" class = "mapModeDataLabel">
+                Connected Satellites
+            </div>
+            <div id = "sattelitesValue" class = "mapModeDataValue">
+                0
+            </div>
+        </div>
+        <div id="hdop" class = "mapModeDataDisplay">
+            <div id = "hdopLabel" class = "mapModeDataLabel">
+                HDOP
+            </div>
+            <div id = "hdopValue" class = "mapModeDataValue">
+                0
+            </div>
+        </div>
+        <div id="correctionAge" class = "mapModeDataDisplay">
+            <div id = "correctionAgeLabel" class = "mapModeDataLabel">
+                Correction Age
+            </div>
+            <div id = "correctionAgeValue" class = "mapModeDataValue">
+                0
+            </div>
+        </div>
+        <div id="savedPoints" class = "mapModeDataDisplay">
+            <div id = "savedPointsLabel" class = "mapModeDataLabel">
+                Points Saved To File
+            </div>
+            <div id = "savedPointsValue" class = "mapModeDataValue">
+                0
+            </div>
+        </div>
+        <div id="metAccuracyTarget" class = "mapModeDataDisplay">
+            <div id = "metAccuracyTargetLabel" class = "mapModeDataLabel">
+                Has Target Accuracy Of 2.5cm Been Met?
+            </div>
+            <div id = "metAccuracyTargetValue" class = "mapModeDataValue">
+                0
+            </div>
+        </div>
+        <div id="CSVButtonDiv">
+            <button type="button" name= "CSVButton" id="CSVButton" onclick="requestCSVRecord()"> Add Location to CSV file. </button>
+        </div>
+    </body>
+</html>

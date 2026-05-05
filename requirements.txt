@@ -1,0 +1,4 @@
+flask
+pynmea2
+pyserial
+geographiclib

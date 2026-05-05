@@ -157,7 +157,7 @@ class GPSLogicClass:
     def read(self):
         line = self.serial.readline().decode('utf-8', errors='ignore').strip() #Read the next line of the serial
 
-        if '$GNGAA' in line or '$GPGGA' in line: #Check to see if it is an NMEA message
+        if '$GNGGA' in line or '$GPGGA' in line: #Check to see if it is an NMEA message
             try:
                 msg = pynmea2.parse(line)
             except pynmea2.ParseError as e:

@@ -361,6 +361,12 @@ class CSVWriter:
         #Initial file name
         fileName = datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + ".csv"
         tempFilePath = self.folderPath + fileName
+        # BUG #3: Path concatenation issue - should use os.path.join() for cross-platform compatibility
+        # Current: tempFilePath = self.folderPath + fileName  (missing path separator on Windows)
+        # Should be: tempFilePath = os.path.join(self.folderPath, fileName)
+
+
+        
         #Count for the attempts to find a clear file
         attemptCount = 0
         #Check if file already exists when initialising the class to make sure no data is overwritten
@@ -380,12 +386,21 @@ class CSVWriter:
         with open(self.filePath, mode='w', newline='', encoding='utf-8') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerows(self.headers)
+                  # BUG #1: Using writerows() instead of writerow()
+            # writerows() expects list of lists (multiple rows)
+            # writerow() is for a single row
+            # Should be: writer.writerow(self.headers)   ← CORRECT: All headers in one row
 
     #Function to write the provided data to the CSV file
     def write(self, data):
         with open(self.filePath, mode='a', newline='', encoding='utf-8') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerows(data.strip().split(","))
+                        # BUG #2: Using writerows() instead of writerow()
+            # writerows() expects list of lists (multiple rows)
+            # writerow() is for a single row with one comma-separated value list
+            # Current: writer.writerows(data.strip().split(","))  ← WRONG: Each value becomes separate row
+            # Should be: writer.writerow(data.strip().split(","))   ← CORRECT: All values in one row
             self.count = self.count + 1
 
     #Function to provide the current entry count
@@ -421,7 +436,9 @@ class TrackMode:
                 targetLat,
                 targetLon
             )
-
+ # BUG #6: Excessive console output - prints every GPS update (every 1 second)
+            # This causes console spam making it hard to see actual errors
+            # Consider reducing these prints or using logging framework
             print("Target Latitude =" + str(targetLat))
             print("Target Longitude =" + str(targetLon))
             print("Actual Latitude =" + str(gpsData.latitude))
@@ -520,6 +537,9 @@ class FlaskWebServerClass():
         @self.app.route('/csvWrite', methods = ['POST'])
         def csvWrite():
             currentGPSState = self.gpsState.get()
+             # BUG #7: Missing None check - if currentGPSState is None, accessing .latitude will crash
+            # Current code assumes GPS data is always available, but it could be None during startup
+            # Should check: if currentGPSState is None: return error response
             dataString = str(self.logger.getCount()) + "," + str(currentGPSState.latitude) + "," + str(currentGPSState.longitude) + "," + str(currentGPSState.altitude) + "," + str(currentGPSState.fix) + "," + str(currentGPSState.satellites) + "," + str(currentGPSState.hdop) + "\n"
 
             self.logger.write(dataString)
@@ -528,6 +548,10 @@ class FlaskWebServerClass():
 
     def run(self):
         self._setupPaths()
+        # BUG #5: debug=True is hardcoded and enabled
+        # This is a security risk - exposes Flask debugger to anyone accessing the server
+        # Should use environment variable: debug_mode = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+        # Then: self.app.run(..., debug=debug_mode, ...)
         self.app.run(host = self.config.host, port = self.config.port, debug = True, threaded = True)
 
 
@@ -544,6 +568,11 @@ class MainApp:
 
         #Setup GPS and RTK logic threads
         self.gps = GPSLogicClassTest(self.config, self.gpsState)
+        # BUG #4: RTK thread is always started, even in test mode with mock GPS
+        # This causes connection errors when base station (10.0.0.10:2101) is not available
+        # Should be conditional: only start if RTK is actually configured/needed
+        # Example: use_rtk = os.getenv('USE_RTK', 'false').lower() == 'true'
+        #          if use_rtk: self.rtk = RTKLogicClass(...)
         self.rtk = RTKLogicClass(self.config, self.gps)
 
         #Setup webserver thread

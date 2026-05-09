@@ -12,7 +12,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
 ## Hardware Required
 
 ### Base Station
-    - Raspberry Pi 4B
+    - Raspberry Pi 4B 4GB
     - u-blox ZED-F9P GNSS module
     - GNSS antenna
     - Tripod Height - 2metres (used for field testing)
@@ -21,7 +21,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - Wi-Fi router (shared) - GL-MT3000
 
 ### Rover
-    - Raspberry Pi 4B
+    - Raspberry Pi 4B 4GB
     - u-blox ZED-F9P GNSS module
     - GNSS antenna (mounted on 2m pole)
     - Tripod Height - 2metres
@@ -42,7 +42,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - PyGPSClient (graphical monitoring)
     - Raspberry Pi OS
 
-## Versions
+## Program Versions
 
 ### farmdog.py (v1.0) - Initial Release Prototype
     - this program connects directly to the ZED-F9P serial port.

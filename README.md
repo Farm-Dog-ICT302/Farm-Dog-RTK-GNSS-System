@@ -48,3 +48,21 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - this program connects directly to the ZED-F9P serial port.
     - proven working with real RTK Fixed data base on equation provided.
 
+### farmdog.py (v2.0) - WEB UI with Flask Server
+    - OOP rewrite with clean class separation (GPS source, RTK client, web server, CSV writer)
+    - Flask web UI on port 5000 this is accessible from any device on the same network
+    - Two modes: Map Mode (live position display) and Track Mode (navigate to target coordinates)
+    - Geodesic distance and azimuth via 'geographiclib' (WGS84 ellipsoid)
+    - Mock GPS source for offline development when hardware is unavailable
+
+
+## Team - ICT302 Team IT01 (S1 2026)
+
+**Supervisor:** David MURRAY
+**Client:** Terry Koziniec
+
+## Acknowledgements
+
+    - Built on top of [RTKBase](https://github.com/Stefal/rtkbase) by Stéphane Péchard 
+    - the [u-blox ZED-F9P](https://www.u-blox.com/en/product/zed-f9p-module) receiver
+    - the [pynmea2](https://github.com/Knio/pynmea2) and [geographiclib](https://geographiclib.sourceforge.io/) libraries.

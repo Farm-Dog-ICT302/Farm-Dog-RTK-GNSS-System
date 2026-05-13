@@ -26,6 +26,7 @@ class Config:
     basePort: int = 2101
     mountPoint: str = 'BaseStation'
     refreshSec: int = 1
+    useMockGPS: bool = True #change to false when Pi is online
 
 #A class that holds all the web server settings
 @dataclass
@@ -249,38 +250,38 @@ class GPSLogicClass:
         #print("Please check to see if the messages being recieved are being filtered out")
         #print(f"GPS Raw: {line}")
 
-        if '$GNGGA' not in line or '$GPGGA' not in line: #Check to see if it is an NMEA message
+        if '$GNGGA' not in line and '$GPGGA' not in line: #Check to see if it is an NMEA message
             return
 
-            try:
+        try:
             
-                msg = pynmea2.parse(line)
+            msg = pynmea2.parse(line)
             
-            except pynmea2.ParseError as e:
+        except pynmea2.ParseError as e:
                 
-                print(f"Error parsing NMEA message: {e}")
-                return
+            print(f"Error parsing NMEA message: {e}")
+            return
 
             #print ("Please send me a screenshot of this output")
             #print (msg.__dict__)
 
-            if msg.latitude is None or msg.longitude is None: #Check to see if the message contains the latitude and longitude
-                return
+        if msg.latitude is None or msg.longitude is None: #Check to see if the message contains the latitude and longitude
+            return
                 
-            #return an instance of the NMWAGPSData dataclass
-            data = NMEAGPSData(
+        #return an instance of the NMWAGPSData dataclass
+        data = NMEAGPSData(
                 
-                latitude = msg.latitude,
-                longitude = msg.longitude,
-                altitude = self._toFloat(getattr(msg, "altitude", 0)),
-                fix = self._toInt(getattr(msg, "gps_qual", 0)),
-                satellites = self._toInt(getattr(msg, "num_sats", 0)),
-                hdop = self._toFloat(getattr(msg, "horizontal_dil", 0)),
+            latitude = msg.latitude,
+            longitude = msg.longitude,
+            altitude = self._toFloat(getattr(msg, "altitude", 0)),
+            fix = self._toInt(getattr(msg, "gps_qual", 0)),
+            satellites = self._toInt(getattr(msg, "num_sats", 0)),
+            hdop = self._toFloat(getattr(msg, "horizontal_dil", 0)),
             
             )
                 
-            #Update the shared GPS instance
-            self.gpsState.update(data)
+        #Update the shared GPS instance
+        self.gpsState.update(data)
 
     @staticmethod
     def _toInt(value) -> int:
@@ -380,7 +381,7 @@ class RTKLogicClass:
 
             except Exception as e: #Error handling
 
-                print("RTK error: {e} - retrying in 2 seconds...")
+                print(f"RTK error: {e} - retrying in 2 seconds...")
                 #print(e)
                 #print("retrying...")
                 time.sleep(2)
@@ -736,12 +737,12 @@ class FlaskWebServerClass():
 
             }), 200
 
-            @app.route('/quit', methods=['POST'])
-            def quit():
+        @app.route('/quit', methods=['POST'])
+        def quit():
 
-                print("Thank you for using the Farm Dog RTK GNSS system.")
-                threading.Timer(0.5, lambda: os._exit(0)).start()
-                return jsonify({"success": True}), 200
+            print("Thank you for using the Farm Dog RTK GNSS system.")
+            threading.Timer(0.5, lambda: os._exit(0)).start()
+            return jsonify({"success": True}), 200
                 
 
     def run(self):
@@ -769,12 +770,12 @@ class MainApp:
         if self.config.useMockGPS:
             
             print("Using mock GPS data source")
-            self.gps = GPSLogicClassTest(self.config, self.gpsSate)
+            self.gps = GPSLogicClassTest(self.config, self.gpsState)
 
         else:
 
             print("Using real GPS data source")
-            self.gps = GPSLogicClass(self.config, self.gpsSate)
+            self.gps = GPSLogicClass(self.config, self.gpsState)
         
         self.rtk = RTKLogicClass(self.config, self.gps)
         

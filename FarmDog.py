@@ -542,6 +542,81 @@ class CSVWriter:
 
         return self.count
 
+    #Function to list all saved points from all CSV files
+    def listSavedPoints(self):
+
+        points = []
+
+        if not os.path.isdir(self.folderPath):
+
+            return points
+
+        #Function will read from the newest file
+        filenames = sorted(
+            
+            (csvFiles for csvFiles in os.listdir(self.folderPath) if csvFiles.endswith('.csv')),
+            reverse = True,
+
+        )
+
+        for filename in filenames:
+
+            filepath = os.path.join(self.folderPath, filename)
+
+            try:
+
+                with open(filepath, mode='r', newline'', encoding='utf-8') as csvFiles:
+
+                    reader = csv.DictReader(csvFile)
+
+                    for row in reader:
+
+                        points.append(self._rowToPoint(row, filename))
+
+            except (OSError, csv.Error) as e:
+
+                print(f"Error unreadable file {filepath}: {e}")
+                continue
+
+        return points
+
+    #Function to convert single CSV row and with note
+    @staticmethod
+    def _rowToPoint(row, filename):
+
+        note = (row.get('Note') or row.get('note') or '').strip()
+
+        try:
+
+            lat = float(row.get('latitude', 0))
+            lon = float(row.get('longitude', 0))
+
+        except (TypeError, ValueError):
+
+            lat, lon = 0.0, 0.0
+
+        dateLabel = filename.rsplit('.', 1)[0]
+
+        if note:
+
+            label = f"{note} ({dateLabel})"
+
+        else:
+
+            label = f"{lat:.6f}, {lon:.6f} ({dateLabel})"
+
+        return {
+
+            "id": f"{filename}:{row.get('count', '')}",
+            "count": row.get('count', ''),
+            "latitude": lat,
+            "longitude": lon,
+            "note": note,
+            "label": label,
+            "sourceFile": filename,
+
+        }
+
 
 #A class for handling the locate mode
 class TrackMode:
@@ -736,6 +811,12 @@ class FlaskWebServerClass():
                 "message": f"Point {self.logger.getCount()} saved successfully."
 
             }), 200
+
+        #Function to return every saved point across all CSV
+        @app.route('/savedPoints')
+        def savedPoints():
+
+            return jsonify({"points": self.logger.listSavedPoints()})
 
         @app.route('/quit', methods=['POST'])
         def quit():

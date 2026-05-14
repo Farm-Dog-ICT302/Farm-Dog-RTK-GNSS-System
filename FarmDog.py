@@ -487,20 +487,20 @@ class CSVWriter:
 
             #if os.path.isfile(tempFilePath):
 
-                attemptCount += 1
+            attemptCount += 1
                
-                #tempFilePath = self.folderPath + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
+            #tempFilePath = self.folderPath + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
                 
-                candidate = os.path.join(self.folderPath, f"{baseName}_{attemptCount}.csv")
+            candidate = os.path.join(self.folderPath, f"{baseName}_{attemptCount}.csv")
             
             #else:
 
-            if attemptCount != 0:
+        if attemptCount != 0:
                     
-                #tempFilePath = self.folderPath + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
-                print(f"File already exists, exporting instead to {candidate}")
+            #tempFilePath = self.folderPath + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
+            print(f"File already exists, exporting instead to {candidate}")
                 
-                #self.fileExists = False;
+            #self.fileExists = False;
 
         return candidate
 

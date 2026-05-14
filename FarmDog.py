@@ -554,7 +554,7 @@ class CSVWriter:
         #Function will read from the newest file
         filenames = sorted(
             
-            (csvFiles for csvFiles in os.listdir(self.folderPath) if csvFiles.endswith('.csv')),
+            (csvFile for csvFile in os.listdir(self.folderPath) if csvFiles.endswith('.csv')),
             reverse = True,
 
         )
@@ -565,7 +565,7 @@ class CSVWriter:
 
             try:
 
-                with open(filepath, mode='r', newline'', encoding='utf-8') as csvFiles:
+                with open(filepath, mode='r', newline='', encoding='utf-8') as csvFile:
 
                     reader = csv.DictReader(csvFile)
 

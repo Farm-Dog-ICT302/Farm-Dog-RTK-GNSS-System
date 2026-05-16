@@ -5,6 +5,7 @@ import socket
 import threading
 import math
 import csv
+import base64
 from datetime import datetime
 import os
 import time
@@ -25,8 +26,10 @@ class Config:
     baseIP: str = '192.168.255.10'
     basePort: int = 2101
     mountPoint: str = 'BaseStation'
+    ntripUser: str = 'admin'
+    ntripPass: str = 'admin'
     refreshSec: int = 1
-    useMockGPS: bool = True #change to false when Pi is online
+    useMockGPS: bool = False #change to false when Pi is online
 
 #A class that holds all the web server settings
 @dataclass
@@ -360,15 +363,30 @@ class RTKLogicClass:
                 sock.connect((self.config.baseIP, self.config.basePort))
 
                 #Create the HTTP request
-                request = (
+                #equest = (
 
+                    #f"GET /{self.config.mountPoint} HTTP/1.0\r\n"
+                    #f"User-Agent: FarmDog/1.0\r\n\r\n"
+
+                #)
+
+                credentials = base64.b64encode(
+                    f"{self.config.ntripUser}:{self.config.ntripPass}".encode()
+		).decode()
+
+                request_str = (
                     f"GET /{self.config.mountPoint} HTTP/1.0\r\n"
-                    f"User-Agent: FarmDog/1.0\r\n\r\n"
-
-                )
+                    f"User-Agent: NTRIP FarmDog/1.0\r\n"
+                    f"Authorization: Basic {credentials}\r\n"
+                    f"\r\n"
+		)
 
                 #Send the request
                 sock.send(request.encode())
+
+                # ADD THIS TEMP LINE TO CHECK THE RESPONSE:
+                response = sock.recv(1024)
+                print(f"Base Station Response: {response.decode('utf-8', errors='ignore')}")
 
                 while True:
 
@@ -382,8 +400,6 @@ class RTKLogicClass:
             except Exception as e: #Error handling
 
                 print(f"RTK error: {e} - retrying in 2 seconds...")
-                #print(e)
-                #print("retrying...")
                 time.sleep(2)
 
             finally:
@@ -418,26 +434,6 @@ class GeoCalculator:
         #result = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)
         #azimuth = result["azi1"]
         #eturn azimuth
-
-    # NMEA not in use currently
-    #@staticmethod #Static so there is no need to create an instance. This function calculates the arc distance between two points.
-    #ef distanceBetweenCoordinatesOLD(lat1, lon1, lat2, lon2):
-        #R=6371000 #Approximately the earths radius in meters
-
-        #dlat = math.radians(lat2 - lat1)
-        #dlon = math.radians(lon2 - lon1)
-
-        #Use haversine formula to account for the earths curvature
-
-        #a = math.sin(dlat/2)**2 + \
-        #math.cos(math.radians(lat1)) * \
-        #math.cos(math.radians(lat2)) * \
-        #math.sin(dlon/2)**2
-
-        #Calculate final distance
-        #arcDistance = R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-
-        #return arcDistance
 
 #A class for handling the writing of the CSV file
 

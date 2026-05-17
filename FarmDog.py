@@ -491,7 +491,7 @@ class CSVWriter:
             
             #else:
 
-        if attemptCount != 0:
+        if attemptCount > 0:
                     
             #tempFilePath = self.folderPath + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
             print(f"File already exists, exporting instead to {candidate}")
@@ -520,11 +520,14 @@ class CSVWriter:
         print(f"Writing point {self.count + 1} to {self.filePath}")
 
         with open(self.filePath, mode='a', newline='', encoding='utf-8') as csvFile:
-            
-            csv.writer(csvFile).writerow(data)
 
-            #writer = csv.writer(csvFile)
-            #writer.writerows(data.strip().split(","))
+            writer = csv.writer(csvFile)
+            writer.writerow(data)
+
+            ## NEW ! Force the data to be written to disk
+            csvFile.flush()
+            os.fsync(csvFile.fileno())
+
             # BUG #2: Using writerows() instead of writerow()
             # writerows() expects list of lists (multiple rows)
             # writerow() is for a single row with one comma-separated value list
@@ -532,6 +535,16 @@ class CSVWriter:
             # Should be: writer.writerow(data.strip().split(","))   ← CORRECT: All values in one row
             
         self.count = self.count + 1
+
+    ## NEW ! Function to start new file name and count drops back to 0
+    def resetSession(self):
+
+        self.count = 0
+        self.filePath = self._resolveFilePath()
+        self.createFile()
+
+        print(f"New session initialised. File created at: {self.filePath}")
+
 
     #Function to provide the current entry count
     def getCount(self) -> int:

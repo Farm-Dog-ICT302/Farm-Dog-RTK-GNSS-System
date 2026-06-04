@@ -1,206 +1,473 @@
 
+// Helper function to turn raw azimuth degrees into human-readable directions 
+function getDirectionText(distance, azimuth) { 
 
-//A class to handle getting the location from the server
-class LocationClass {
+   if (distance < 0.025) return "Arrived at Target!";
 
-    //Constructor
-    constructor(pollInterval = 500) {
-        this.pollInterval = pollInterval;
-        this.timer = null;
-        this.isStopped = false;
-        this.isRequestRunning = false;
-    }
+   const sectors = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"]; 
 
-    //start the recursive polling function
-    startPolling(callback) {
+   const index = Math.round(((azimuth % 360) + 360) % 360 / 45) % 8; 
 
-        //Check if already running
-        if (!this.isStopped && this.timer) return;
-        this.isStopped = false;
-        this.isRequestRunning = false;
+   return `${sectors[index]} (${azimuth.toFixed(1)}°)`; 
 
-        const pollServerGPSData = () => {
-            //Call to the server for specific information, providing the back end a latitude and a longditude target based on input
+} 
+
+ 
+
+// A class to handle getting the location from the server 
+class LocationClass { 
+
+   constructor(pollInterval = 500) { 
+
+       this.pollInterval = pollInterval; 
+
+       this.timer = null; 
+
+       this.isStopped = false; 
+
+       this.isRequestRunning = false; 
+
+   } 
+
+ 
+
+   startPolling(callback) { 
+
+       if (!this.isStopped && this.timer) return; 
+
+       this.isStopped = false; 
+
+       this.isRequestRunning = false; 
+
+ 
+
+       const pollServerGPSData = () => { 
+
+           if (this.isRequestRunning) return; 
+
+           this.isRequestRunning = true; 
+
+           const lockedLat = $("#targetLat").data("locked"); 
+           const lockedLon = $("#targetLon").data("locked"); 
+
+           $.ajax({ 
+
+               url: "/trackGPSData", 
+
+               data: { 
+
+                   targetLat: lockedLat !== undefined ? lockedLat.toString() : "0",  
+                   targetLon: lockedLon !== undefined ? lockedLon.toString() : "0" 
+
+               }, 
+
+               type: "GET", 
+
+               dataType: "json", 
+
+               success: (data) => { 
+
+                   callback(data); 
+
+               }, 
+
+               error: (xhr, status, error) => { 
+
+                   console.error("Polling error: " + status + error); 
+
+               }, 
+
+               complete: () => { 
+
+                   this.isRequestRunning = false; 
+
+                   if (!this.isStopped) { 
+
+                       this.timer = setTimeout(() => pollServerGPSData(), this.pollInterval); 
+
+                   } 
+
+               } 
+
+           }); 
+
+       }; 
+
+       pollServerGPSData(); 
+
+   } 
+
+ 
+
+   stopPolling() { 
+
+       this.isStopped = true; 
+
+       if (this.timer) clearTimeout(this.timer); 
+
+   } 
+
+} 
+
+ 
+
+class CompassClass { 
+
+   constructor() { 
+
+       this.listener = null; 
+
+   } 
+
+ 
+
+   // Safe subscription registration method 
+   registerListener(callback) { 
+
+       const handleOrientation = (event) => { 
+
+           // iOS native heading relative to magnetic north 
+           let heading = event.webkitCompassHeading; 
+		   
+		   console.log("ios heading" + String(heading));
+
+           // Android alternative sensor calculation fallback 
+           if (heading === undefined || heading === null) { 
+
+               if (event.alpha !== null && event.alpha !== undefined) { 
+
+                   heading = (360 - event.alpha) % 360;  
+
+               } else {
+				   heading = 250;
+			   }
+
+           } 
+
+           if (heading !== null && heading !== undefined) { 
+
+               callback(heading); 
+
+           }
+
+       }; 
+
+       if (typeof DeviceOrientationEvent === 'undefined') { 
+
+           console.error('DeviceOrientationEvent is not supported on this device.'); 
+
+           $("#compass").html("The compass is not supported by this device"); 
+
+           return; 
+
+       } 
+
+       window.addEventListener('deviceorientation', handleOrientation); 
+
+       this.listener = handleOrientation; 
+
+   } 
+
+   stopPolling() { 
+
+       if (this.listener) { 
+
+           window.removeEventListener('deviceorientation', this.listener); 
+
+           this.listener = null; 
+
+       } 
+
+   } 
+
+} 
+
+class NavigationUtilitiesClass { 
+
+   static degToRad(deg) { return deg * (Math.PI / 180); } 
+   static radToDeg(rad) { return rad * (180 / Math.PI); } 
+
+   static getArrowRotation(azimuth, phoneHeading) { 
+
+       let rotation = azimuth - phoneHeading; 
+
+       return (rotation + 360) % 360; 
+
+   } 
+
+}  
+
+class UIClass { 
+
+   updateArrow(rotation) { 
+		console.log("arrow updating");
+		console.log(rotation);
+		console.log(`rotate(${rotation}deg)`);
+		document.getElementById("arrow").style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+   } 
+
+}  
+
+class TrackModeApp { 
+
+   constructor() { 
+
+       this.locationClass = new LocationClass(); 
+
+       this.compassClass = new CompassClass(); 
+
+       this.uiClass = new UIClass(); 
+
+       this.currentLat = null; 
+
+       this.currentLon = null; 
+
+       this.isRunning = false; 
+
+       this.currentAzimuth = 0.0; 
+
+       this.targetSet = false; 
+
+   } 
+
+   start() { 
+
+       this.isRunning = true; 
+
+       // Find Target button click handler (Acts as the vital explicit User Gesture context) 
+       $(document).off("click", "#findButton").on("click", "#findButton", () => { 
+
+           const lat = parseFloat($("#targetLat").val()); 
+           const lon = parseFloat($("#targetLon").val()); 
+
+           if (isNaN(lat) || isNaN(lon)) { 
+
+               $("#targetStatus").html("<span style='color: red;'>Invalid coordinates. Enter numbers.</span>"); 
+
+               return; 
+
+           } 
+
+           if (lat < -90 || lat > 90 || lon < -180 || lon > 180) { 
+
+               $("#targetStatus").html("<span style='color: red;'>Coordinates out of boundary range.</span>"); 
+
+               return;  
+
+           } 
+
+           this.targetSet = true; 
+
+           $("#targetLat").data("locked", lat); 
+           $("#targetLon").data("locked", lon); 
+
+           $("#targetStatus").html("<span style='color: green;'>Target set to (" + lat.toFixed(8) + "°, " + lon.toFixed(8) + "°)</span>"); 
+
+           // CRITICAL FIX: Trigger permission authorization flow inside the user touch event thread 
+           this.initCompass(); 
+
+       }); 
+
+ 
+       $(document).off("click", "#saveSessionButton").on("click", "#saveSessionButton", () => {
+
+            if (!confirm("Are you sure you want to save this current session and reset to point count to 1? "))
+
+        return;
+
             $.ajax({
-                url: "/trackGPSData",
-                data: {targetLat: $("#targetLat").val(), targetLon: $("#targetLon").val()},
-                type: "GET",
+                url: "/saveSession",
+                type: "POST",
                 dataType: "json",
-                success: (data) => {
-                    callback(data.latitude, data.longitude, data.distance, data.azimuth);
-                    console.log(data);
-                },
-                error: (xhr, status, error) => {
-                    console.error("Polling error: " + status + error);
-                },
-                complete: () => {
-                    this.isRequestRunning = false;
-                    if (!this.isStopped) {
-                        this.timer = setTimeout(() => pollServerGPSData(), this.pollInterval);
+                success: (response) => {
+                    if (response.success) {
+                        $("#saveStatus").html("<span style='color: green;'>Session saved successfully! Count reset to 1.</span>");
+
+                        // NEW ! Clear out old UI tracking states
+                        $("#distanceValue").html("--");
+                        $("#directionValue").html("Set target below ↓");
+                        $("#targetLat").data("locked", undefined).val("");
+                        $("#targetLon").data("locked", undefined).val("");
+                        this.targetSet = false;
+
+                        setTimeout(() => {
+                            $("#saveStatus").html("");
+                        }, 4000);
                     }
+                },
+
+                error: (xhr, status, error) => {
+                    console.error("Error saving session: " + status + error);
+                    $("#saveStatus").html("<span style='color: red;'>Error saving session. Try again.</span>");
                 }
             });
-        };
-        pollServerGPSData();
-    }
+       });
 
-    stopPolling() {
-        this.isStopped = true;
-        if (this.timer) clearTimeout(this.timer);
-    }
-}
+       // Start the GPS server polling loop 
+       this.locationClass.startPolling((data) =>  {  
 
+           if (!data || data.error) return; 
 
-class CompassClass {
-    constructor() {
-        this.listener = null;
-    }
+           if (typeof data.latitude === 'number') { 
 
-    startPolling(callback) {
-        const handleOrientation = (event) => {
-            const heading = event.webkitCompassHeading || event.alpha;
-            if (event.alpha != null) callback(heading);
-        };
+               this.currentLat = data.latitude;  
 
-        // Check to see if if DeviceOrientationEvent is supported
-        if (typeof DeviceOrientationEvent === 'undefined') {
-            console.error('DeviceOrientationEvent is not supported on this device.');
-            $("#compass").html("The compass is not supported by this device");
-            return;
-        }
+               $("#latitudeValue").html(data.latitude.toFixed(8) + "°"); 
 
-        //Request permission on iOS13+ devices
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                    this.listener = handleOrientation;
-                } else {
-                    $("#compass").html("Permission must be given for compass to function");
-                    console.error('Permission denied for device orientation.');
-                }
-            })
-            .catch(console.error);
-        } else {
-            //Non IOS devices
-            window.addEventListener('deviceorientation', handleOrientation);
-            this.listener = handleOrientation;
-        }
-    }
+           } 
 
-    stopPolling() {
-        if (this.listener) window.removeEventListener('deviceorientation', this.listener);
-    }
-}
+           if (typeof data.longitude === 'number') { 
 
-class NavigationUtilitiesClass {
+               this.currentLon = data.longitude;  
 
-    // Converts degrees to radians
-    static degToRad(deg) {
-        return deg * (Math.PI / 180);
-    }
+               $("#longitudeValue").html(data.longitude.toFixed(8) + "°"); 
 
-    // Converts radians to degrees
-    static radToDeg(rad) {
-        return rad * (180 / Math.PI);
-    }
+           } 
 
-    // Calculate arrow rotation for the phone screen
-    static getArrowRotation(azimuth, phoneHeading) {
-        // Arrow rotation = difference between azimuth and phone heading
-        let rotation = azimuth - phoneHeading;
-        // Normalize to 0-360°
-        rotation = (rotation + 360) % 360;
-        console.log("current rotation = " + String(rotation));
-        return rotation;
-    }
-}
+            // Cleaned and aligned RTK Fix diagnostic render
+            if (typeof data.fix === 'number') {
+                let fixText = "--";
+                let fixColor = "red";
 
-class UIClass {
-    constructor(arrowSelector) {
-        this.arrow = $(arrowSelector);
-        this.latValue = null;
-        this.lonValue = null;
-    }
+            if (data.fix === 4) { fixText = "4 - RTK Fixed (Centimeter)"; fixColor = "green"; }
+            else if (data.fix === 5) { fixText = "5 - RTK Float (Decimeter)"; fixColor = "orange"; }
+            else if (data.fix === 1) { fixText = "1 - Standard GPS (Meter)"; fixColor = "red"; }
 
-    updateArrow(rotation) {
-        this.arrow.css('transform', `rotate(${rotation}deg)`);
-    }
-
-    updateValues(lat, long, distance) {
-        $("#longitudeValue").html(long.toFixed(2) + "°");
-        $("#latitudeValue").html(lat.toFixed(2) + "°");
-        $("#distanceValue").html(distance.toFixed(2) + " meters");
-    }
-
-    static async toggleDiv(name) {
-        if ($("#" + name + "Checkbox").is(":checked")) {
-            $("#" + name).show();
-            localStorage.setItem(name, 'true');
-        } else {
-            $("#" + name).hide();
-            localStorage.setItem(name, 'false');
-        }
-    }
-
-}
-
-class ConvertFloatOrZero {
-    static convert (value) {
-        const f = parseFloat(value);
-        if (isNaN(f)) {
-            console.log("error not an acceptable value, using 0.00 degrees");
-            return 0.00;
-        }
-        return f;
-    }
-}
-
-//Cross your fingers this all works
-class TrackModeApp {
-    constructor() {
-        this.locationClass = new LocationClass();
-        this.compassClass = new CompassClass();
-        this.uiClass = new UIClass("#arrow");
-        this.currentLat = null;
-        this.currentLon = null;
-        //Boolean for telling parent class if this one is running or not
-        this.isRunning = false;
-        this.currentAzimuth = 0.0;
-    }
-
-    start() {
-        //Flip running boolean
-        this.isRunning = true;
-        //Start the GPS server polling
-        this.locationClass.startPolling((lat, lon, dist, azimuth) => {
-            this.currentLat = lat;
-            this.currentLon = lon;
-            this.uiClass.updateValues(lat, lon, dist);
-            this.azimuth = azimuth;
-        });
-
-        //Start polling the phone's compass
-        this.compassClass.startPolling((heading) => {
-            if (this.currentLat != null && this.currentLon != null && this.azimuth != null) {
-                const targetLat = ConvertFloatOrZero.convert($("#targetLat").val());
-                const targetLon = ConvertFloatOrZero.convert($("#targetLon").val());
-                const rotation = NavigationUtilitiesClass.getArrowRotation(
-                    this.azimuth,
-                    heading
-                );
-                this.uiClass.updateArrow(rotation);
-                console.log(`Arrow rotation ${rotation.toFixed(2)}°`);
+                $("#fixValue").html(fixText).css("color", fixColor);
+            
             }
-        });
 
-    }
+           if (typeof data.distance === 'number' && !isNaN(data.distance) && this.targetSet) { 
 
-    stop() {
-        this.locationClass.stopPolling();
-        this.compassClass.stopPolling();
-        this.isRunning = false;
-    }
-}
+               if (data.distance >= 1000) { 
 
+                   $("#distanceValue").html((data.distance / 1000).toFixed(3) + " km"); 
+
+               } else { 
+
+                   $("#distanceValue").html(data.distance.toFixed(2) + " meters"); 
+
+               } 
+
+               if (typeof data.azimuth === 'number') { 
+
+                   this.currentAzimuth = data.azimuth;  
+
+                   const dir = getDirectionText(data.distance, data.azimuth);  
+
+                   $("#directionValue").html(dir); 
+
+               } 
+
+           } else { 
+
+               if (!this.targetSet) { 
+
+                   $("#distanceValue").html("--"); 
+
+                   $("#directionValue").html("Set target below ↓"); 
+
+               } 
+
+           } 
+
+       }); 
+
+       // Auto-initialize for Android/Desktop environments that do not require explicit click wrappers 
+       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') { 
+
+           this.initCompass(); 
+
+       } 
+
+   } 
+
+ 
+
+   // Modular initialization execution engine 
+   initCompass() { 
+
+       if (typeof DeviceOrientationEvent === 'undefined') { 
+
+           console.error('DeviceOrientationEvent is not supported on this device.'); 
+
+           return; 
+
+       } 
+
+       const startCompassListening = () => { 
+	   
+		   console.log("starting compass listener");
+
+           this.compassClass.stopPolling(); // Clear redundant bindings to prevent leaks 
+
+           this.compassClass.registerListener((heading) => { 
+
+               console.log("Heading:", heading);
+
+               // Default to 0.0 azimuth if target isn't fully calculated yet so arrow spins relative to True North immediately 
+
+               const rotation = NavigationUtilitiesClass.getArrowRotation( 
+
+                   this.currentAzimuth || 70.0, 
+
+                   heading 
+
+               );
+
+               console.log("Rotation:", rotation);
+
+               this.uiClass.updateArrow(rotation); 
+
+           }); 
+
+       }; 
+
+ 
+
+       // Handle strict Apple/iOS hardware permission constraints 
+       if (typeof DeviceOrientationEvent.requestPermission === 'function') { 
+
+           DeviceOrientationEvent.requestPermission() 
+
+           .then(permissionState => { 
+
+               if (permissionState === 'granted') { 
+
+                   startCompassListening(); 
+
+               } else { 
+
+                   $("#targetStatus").append("<br><span style='color: orange;'>Compass hardware access denied.</span>"); 
+
+               } 
+
+           }) 
+
+           .catch(console.error); 
+
+       } else { 
+
+           // Direct binding for non-permission-gated devices 
+           startCompassListening(); 
+
+       } 
+
+   } 
+
+   stop() { 
+
+       this.locationClass.stopPolling(); 
+
+       this.compassClass.stopPolling(); 
+
+       this.isRunning = false; 
+
+       $(document).off("click", "#findButton"); 
+
+       $(document).off("click", "#saveSessionButton");
+
+   } 
+
+} 

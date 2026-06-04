@@ -1,53 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Compass to Target</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/trackMode.css') }}">
-    </head>
-    <body>
-        <button id="return">Return to Main Menu</button>
-            <div id="longitude" class = "trackModeDataDisplay">
-                <div id = "longitudeLabel" class = "trackModeDataLabel">
-                    Longditude
-                </div>
-                <div id = "longitudeValue" class = "trackModeDataValue">
-                    0.0°
-                </div>
-                </div>
-            <div id="latitude" class = "trackModeDataDisplay">
-                <div id = "latitudeLabel" class = "trackModeDataLabel">
-                    Latitude
-                </div>
-                <div id = "latitudeValue" class = "trackModeDataValue">
-                    0.0°
-                </div>
-            </div>
-            <div id="distance" class = "trackModeDataDisplay">
-                <div id = "distanceLabel" class = "trackModeDataLabel">
-                    Distance
-                </div>
-                <div id = "distanceValue" class = "trackModeDataValue">
-                    0.0 meters
-                </div>
-            </div>
+<button id="return">Return to Main Menu</button>
 
+<div id="informationDisplay">
 
-        <div id = "compassBox">
-            <div id = "compass">
-                <div id = "arrow">
-                </div>
-            </div>
-        </div>
+    <div class="trackModeDataDisplay">
+        <div class="trackModeDataLabel">Current Latitude</div>
+        <div id="latitudeValue" class="trackModeDataValue">--</div>
+    </div>
 
-        <div id="targetLat+Lon" class = "trackModeDataDisplay">
-            <div id = "targetLatLabel" class = "trackModeDataLabel">
-                Target Lat: <input id = "targetLat" value = "0.00" />
-            </div>
-            <div id = "TargetLonLabel" class = "trackModeDataLabel">
-                Target Lon: <input id = "targetLon" value = "0.00" />
-            </div>
-        </div>
-    </body>
-</html>
+    <div class="trackModeDataDisplay">
+        <div class="trackModeDataLabel">Current Longitude</div>
+        <div id="longitudeValue" class="trackModeDataValue">--</div>
+    </div>
+
+    <div class="trackModeDataDisplay">
+        <div class="trackModeDataLabel">Distance to Target</div>
+        <div id="distanceValue" class="trackModeDataValue">--</div>
+    </div>
+
+    <div class="trackModeDataDisplay">
+        <div class="trackModeDataLabel">Direction</div>
+        <div id="directionValue" class="trackModeDataValue">Enter target below ↓</div>
+    </div>
+
+    <div class="trackModeDataDisplay">
+        <div class="trackModeDataLabel">RTK Fix Quality</div>
+        <div id="fixValue" class="trackModeDataValue" style="font-weight: bold; color: orange;">--</div>
+    </div>
+
+</div>
+
+<div class="trackModeDataDisplay">
+    <div class="trackModeDataLabel">Target Latitude</div>
+    <input id="targetLat" class="trackModeInput"
+           type="text" value=""
+           placeholder="e.g. -32.069218"/>
+</div>
+
+<div class="trackModeDataDisplay">
+    <div class="trackModeDataLabel">Target Longitude</div>
+    <input id="targetLon" class="trackModeInput"
+           type="text" value=""
+           placeholder="e.g. 115.836058"/>
+</div>
+
+<div id="findButtonDiv">
+    <button id="findButton">Find Target</button>
+</div>
+
+<div id="targetStatus"></div>
+
+<div id="compassBox">
+    <div id="compass">
+        <div id="arrow"></div>
+    </div>
+</div>

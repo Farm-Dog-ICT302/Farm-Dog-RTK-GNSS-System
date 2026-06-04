@@ -15,6 +15,6 @@ else
 fi
 
 #Run the Python file
-python3 FarmDog.py
+python3 "FarmDog.py"
 
 read

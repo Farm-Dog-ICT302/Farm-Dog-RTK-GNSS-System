@@ -32,8 +32,21 @@ class PageNavHandler {
         //Sets page name in local storage
         localStorage.setItem("page", pageName);
 
+		//Set page title
+		switch(pageName) {
+			case "mainMenu":
+				$("#contentTitle").html("Main Menu");
+				break;
+			case "findMode":
+				$("#contentTitle").html("Find Mode");
+				break;
+			case "mapMode":
+				$("#contentTitle").html("Map Mode");
+				break;
+		}
+
         //Wipe the options menu
-        wipeMenu();
+        PageNavHandler.wipeMenu();
 
         //Console logger
         console.log("polling /" + pageName);
@@ -75,6 +88,7 @@ class AppInitiator {
 
     //Checks to see the page that they were on last and returns to it upon refresh
     async pageCheck() {
+        PageNavHandler.wipeMenu();
         console.log("PAGE CHECK");
         console.log("This is the page right after refresh" + localStorage.getItem("page"));
         switch(localStorage.getItem("page")) {
@@ -105,21 +119,21 @@ class AppInitiator {
 }
 
 //A class that returns various settings dictionaries
-class SettingsGetter {
+//class SettingsGetter {
 
     //Get settings for map mode
-    static getMapModeSettings() {
-        let backendDataNames = ["longditude","latitude","altitude","accuracy","RTKFix","sattelites","hdop","correctionAge","savedPoints", "metAccuracyTarget", "notes"];
-        let settingsDictionary = {};
+    //static getMapModeSettings() {
+        //let backendDataNames = ["longditude","latitude","altitude","accuracy","RTKFix","sattelites","hdop","correctionAge","savedPoints", "metAccuracyTarget", "notes"];
+        //let settingsDictionary = {};
         //Loop for each of the map menu
-        backendDataNames.forEach((name) => {
-            settingsDictionary[name] = localStorage.getItem(name);
-        });
-        return settingsDictionary;
+        //backendDataNames.forEach((name) => {
+        //    settingsDictionary[name] = localStorage.getItem(name);
+        //});
+        //return settingsDictionary;
 
-    }
+   //}
 
-}
+//}
 
 //A class responsible for the activation and deactivation of the button listeners for every page
 class ButtonListeners {
@@ -146,45 +160,65 @@ class ButtonListeners {
 
     //MAIN MENU LISTENERS//
     mainMenuListeners() {
+
+        // Remove old listeners to prevent duplicates
+        this.deactivateNonMainMenuModeListeners();
+
         //activate listeners
-        $(document).on("click","#mapModeButton", () => {
+        $(document).off("click","#mapModeButton").on("click","#mapModeButton", () => {
             console.log("to map mode");
             this.app.navigateToMapMode();
         });
 
-        $(document).on("click","#trackModeButton", () => {
+        $(document).off("click","#trackModeButton").on("click","#trackModeButton", () => {
             this.app.navigateToTrackMode();
         });
 
-        //deactivate any existing non main menu listeners
-        this.deactivateNonMainMenuModeListeners();
+        
+        $(document).off("click", "#quit").on("click", "#quit", () => {
 
+            if (confirm("Are you sure you want to quit the Farm Dog?")) {
+                $.ajax({
+                    url: "/quit",
+                    type: "POST",
+                    success: () => {
+                        document.body.innerHTML = "<h2 style='color:white; text-align:center; margin-top:40vh'>Farmd Dog Shutting down...</h2>";
+                        console.log("Quit signal sent to server");
+                    }, error: () => {
+                        alert("Error sending quit signal to server, close browser window to quit");
+                    }
+                });
+            }
+
+        });
     }
-
 
     //MAP MODE LISTENERS//
     mapModeListeners() {
+
+        this.deactivateMainMenuListeners();
+
         //activate listeners
-        $(document).on("click","#return", () => {
+        $(document).off("click", "#return").on("click","#return", () => {
             this.app.navigateToMainMenu();
         });
-        $(document).on("click","#CSVButton", () => {
+
+        $(document).off("click", "#CSVButton").on("click","#CSVButton", () => {
             console.log("writing to CSV");
             this.app.mapModeHandler.csvWriter.write();
         });
 
-        //deactivate main menu listeners
-        this.deactivateMainMenuListeners();
     }
 
     //TRACK MODE LISTENERS//
     trackModeListeners() {
-        $(document).on("click","#return", () => {
+
+        this.deactivateMainMenuListeners();
+
+        $(document).off("click", "#return").on("click","#return", () => {
             this.app.navigateToMainMenu();
         });
 
-        //deactivate main menu listeners
-        this.deactivateMainMenuListeners();
     }
 
     //DEACTIVATION
@@ -192,17 +226,24 @@ class ButtonListeners {
     deactivateMainMenuListeners() {
         $(document).off("click", "#mapModeButton");
         $(document).off("click", "#trackModeButton");
+        $(document).off("click", "#quit");
     }
 
     //Everything else
     deactivateNonMainMenuModeListeners() {
-        if($('#return').length){
-            $(document).off("click", "#return");
-        }
+        //if($('#return').length){
+        //    $(document).off("click", "#return");
+        //}
 
-        if($('#CSVButton').length){
-            $(document).off("click", "#CSVButton");
-        }
+        //if($('#CSVButton').length){
+        //    $(document).off("click", "#CSVButton");
+        //}
+
+         //$(document).off("click", "#quit");
+
+         $(document).off("click", "#return");
+         $(document).off("click", "#CSVButton");
+
     }
 
 }
@@ -230,7 +271,7 @@ class MainApp {
 
 
         //Get the map settings from localStorage
-        this.mapModeSettings = SettingsGetter.getMapModeSettings();
+        //this.mapModeSettings = SettingsGetter.getMapModeSettings();
 
     }
 
@@ -257,21 +298,55 @@ class MainApp {
     //Activates the map mode sub page
     navigateToMapMode() {
         //Move to the page
-        PageNavHandler.navigateToPage("mapMode");
+
+        $.ajax({
+            url: ' /mapMode',
+            type: 'GET',
+            success: (data) => {
+                $('#mainContent').html(data);
+                //Activate listeners
+                this.buttonListeners.mapModeListeners();
+                //Start map mode handler
+                this.mapModeHandler.start();
+            }
+        });
+
+        //PageNavHandler.navigateToPage("mapMode");
         //Activate listeners
-        this.buttonListeners.mapModeListeners();
+        //this.buttonListeners.mapModeListeners();
         //Start map mode handler
-        this.mapModeHandler.start();
+        //this.mapModeHandler.start();
+
+        localStorage.setItem("page", "mapMode");
+		$("#contentTitle").html("Map Mode");
+        PageNavHandler.wipeMenu();
+
     }
 
     //Activates the track mode sub page
     navigateToTrackMode() {
+
+        $.ajax({
+            url: ' /trackMode',
+            type: 'GET',
+            success: (data) => {
+                $('#mainContent').html(data);
+                this.buttonListeners.trackModeListeners();
+                this.trackModeHandler.start();
+            }
+        });
+
+
         //Move to the page
-        PageNavHandler.navigateToPage("trackMode");
+        //PageNavHandler.navigateToPage("trackMode");
         //Activate listeners
-        this.buttonListeners.trackModeListeners();
+        //this.buttonListeners.trackModeListeners();
         //Start track mode handler
-        this.trackModeHandler.start();
+        //this.trackModeHandler.start();
+
+        localStorage.setItem("page", "trackMode");
+		$("#contentTitle").html("Find Mode");
+        PageNavHandler.wipeMenu();
     }
 
 }

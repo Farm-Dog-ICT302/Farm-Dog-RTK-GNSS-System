@@ -199,11 +199,27 @@ class NavigationUtilitiesClass {
 
 class UIClass { 
 
-   updateArrow(rotation) { 
-		console.log("arrow updating");
-		console.log(rotation);
-		console.log(`rotate(${rotation}deg)`);
-		document.getElementById("arrow").style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+    constructor() {
+        this.currentRotation = 0;
+    }
+
+    updateArrow(rotation) {
+
+        //Calculate shortest path around circle
+        let delta = rotation - this.currentRotation;
+
+        if (delta > 180) {
+            delta -= 360;
+        } else if (delta < -180) {
+            delta += 360;
+        }
+
+        this.currentRotation += delta;
+
+		//console.log("arrow updating");
+		//console.log(rotation);
+		//console.log(`rotate(${rotation}deg)`);
+		document.getElementById("arrow").style.transform = `translate(-50%, -50%) rotate(${this.currentRotation}deg)`;
 
    } 
 

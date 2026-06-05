@@ -1,4 +1,6 @@
 flask
+Flask-Talisman
 pynmea2
 pyserial
 geographiclib
+

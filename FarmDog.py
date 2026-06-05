@@ -10,10 +10,12 @@ import os
 import time
 from dataclasses import dataclass, asdict
 from flask import Flask, render_template, jsonify, request
+from flask_talisman import Talisman
 import sys
 import random
 from typing import Optional
 from geographiclib.geodesic import Geodesic
+import subprocess
 
 
 
@@ -33,6 +35,8 @@ class Config:
 class WebServerConfig:
     host: str = '0.0.0.0'
     port: int = 5000
+    certFile: str = "cert.pem"
+    keyFile: str = "key.pem"
 
 
 #A dataclass that holds all the GPS data
@@ -669,7 +673,49 @@ class MapMode:
         return jsonify(gpsDataDict)
 
 
+#A class that ensures SSL certificates exist
+class SSLCertificateClass():
 
+    #Ensure certifications exist
+    @staticmethod
+    def ensureSSLCertificates():
+        cert_dir = "SSLCertificates"
+        os.makedirs(cert_dir, exist_ok=True)
+
+        certFile = os.path.join(cert_dir, "server.pem")
+        keyFile = os.path.join(cert_dir, "server-key.pem")
+
+        #If the certificates already exist just return them
+        if os.path.exists(certFile) and os.path.exists(keyFile):
+            return certFile, keyFile
+
+        print("Generating HTTPS certificates...")
+
+        try:
+            subprocess.run(
+                ["mkcert", "-install"],
+                check=True
+            )
+
+            subprocess.run(
+                [
+                    "mkcert",
+                    "-cert-file", certFile,
+                    "-key-file", keyFile,
+                    "localhost",
+                    "127.0.0.1",
+                    socket.gethostname()
+                ],
+                check=True
+            )
+
+            print("Certificates generated successfully.")
+
+        except Exception as e:
+            print(f"Certificate generation failed: {e}")
+            raise Exception(f"Certificate generation failed: {e}")
+
+        return certFile, keyFile
 
 
 #A class for handling the FLASK webserver, as the main interface goes through this it acts as the main routing hub for user input and gps output
@@ -677,14 +723,26 @@ class FlaskWebServerClass():
     
     def __init__(self, config: WebServerConfig, gpsState: GPSState): #Constructor
         
-        self.config = config
-        self.app = Flask(__name__)
+        self.config = config #The config class
+        self.app = Flask(__name__) #The flask app itself
         self.gpsState = gpsState #Shared GPS data class
         self.logger = CSVWriter("output") #Create the CSV file writer
+
+
+        #Enforce HTTPS
+        Talisman(
+            self.app,
+            force_https = True,
+            strict_transport_security = True
+        )
 
         #GPS Data structure
         self.GPSDataOrder = ["latitude", "longitude", "altitude", "fix", "satellites", "hdop"] #Order that the elements should be displayed
         self.GPSDataMeasurement = measurement = ["", "", "", "", "", ""] #A measurement for each element in the order array
+
+
+
+
 
 
 
@@ -807,7 +865,17 @@ class FlaskWebServerClass():
 
     def run(self):
         self._setupPaths()
-        self.app.run(host = self.config.host, port = self.config.port, debug = False, threaded = True)
+        certFile, keyFile = SSLCertificateClass.ensureSSLCertificates()
+        self.app.run(
+            host = self.config.host,
+            port = self.config.port,
+            debug = False,
+            threaded = True,
+            ssl_context = (
+                certFile,
+                keyFile
+            )
+        )
 
 
 

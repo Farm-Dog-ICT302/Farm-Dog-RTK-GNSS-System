@@ -23,7 +23,7 @@ import subprocess
 @dataclass
 class Config:
     gpsPort: str = '/dev/ttyACM0'
-    baudRate: int = 9600
+    baudRate: int = 115200
     baseIP: str = '192.168.255.10'  # Base Pi running RTKBASE
     basePort: int = 2101
     mountPoint: str = 'BaseStation'

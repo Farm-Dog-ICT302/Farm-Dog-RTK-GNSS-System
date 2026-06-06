@@ -27,6 +27,8 @@ class Config:
     baseIP: str = '192.168.255.10'  # Base Pi running RTKBASE
     basePort: int = 2101
     mountPoint: str = 'BaseStation'
+    ntripUser: str = 'admin'
+    ntripPass: str = 'admin'
     refreshSec: int = 1
     useMockGPS: bool = True         # flip to False when the rover Pi is connected
 
@@ -249,9 +251,6 @@ class GPSLogicClass:
     def read(self):
         
         line = self.serial.readline().decode('utf-8', errors='ignore').strip() #Read the next line of the serial
-        
-        #print("Please check to see if the messages being recieved are being filtered out")
-        #print(f"GPS Raw: {line}")
 
         if '$GNGGA' not in line and '$GPGGA' not in line: #Check to see if it is an NMEA message
             return
@@ -264,9 +263,6 @@ class GPSLogicClass:
                 
             print(f"Error parsing NMEA message: {e}")
             return
-
-        #print ("Please send me a screenshot of this output")
-        #print (msg.__dict__)
 
         if msg.latitude is None or msg.longitude is None: #Check to see if the message contains the latitude and longitude
             return
@@ -359,16 +355,30 @@ class RTKLogicClass:
                 #Connect to the server
                 sock.connect((self.config.baseIP, self.config.basePort))
 
+                user_pass = f"{self.config.ntripUser}:{self.config.ntripPass}"
+
+                clean_credentials = base64.b64encode(user_pass.encode('utf-8')).decode('utf-8')
+
                 #Create the HTTP request
                 request_str = (
                     
                     f"GET /{self.config.mountPoint} HTTP/1.0\r\n"
-                    f"User-Agent: FarmDog/1.0\r\n\r\n"
+                    f""User-Agent: NTRIP FarmDog/1.0\r\n"
+                    f"Authorisation: Basic {clean_credentials}\r\n"
+                    f"\r\n"
                     
                 )
                 
                 #Send the request
-                sock.send(request_str.encode())
+                #sock.send(request_str.encode())
+
+                print(f"Transmitting Handshake: request_str")
+
+                sock.sendall(request_str.encode('utf-8'))
+
+                #Check the respose line
+                response = sock.recv(1024)
+                print(f"Base Station Response: {response.decode('utf-8', errors='ignore')}")
 
                 while True:
                     
@@ -376,14 +386,16 @@ class RTKLogicClass:
 
                     if not data: #Check if server closed the connection
                         break
+                    
+                    #Debug line
+                    print(f"Debug: Received {len(data)} bytes of correction data")
+                    
 
                     self.gpsLogicClass.sendCorrections(data) #Send data to the class responsible for handling GPS logic
 
             except Exception as e: #Error handling
                 
                 print(f"RTK error: {e} - retrying in 2 seconds...")
-                #print(e)
-                #print("retrying...")
                 time.sleep(2)
                 
             finally:
@@ -408,49 +420,19 @@ class GeoCalculator:
         
         return Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)["s12"]
 
-        #distance = result["s12"] #Distance in meters
-        #return distance
-
     @staticmethod
     def azimuthBetweenCoordinates(lat1, lon1, lat2, lon2) -> float:
         
         return Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)["azi1"]
 
-        #azimuth = result["azi1"]
-        #return azimuth
-
-    #@staticmethod #Static so there is no need to create an instance. This function calculates the arc distance between two points.
-    #def distanceBetweenCoordinatesOLD(lat1, lon1, lat2, lon2):
-        #R=6371000 #Approximately the earths radius in meters
-
-        #dlat = math.radians(lat2 - lat1)
-        #dlon = math.radians(lon2 - lon1)
-
-        #Use haversine formula to account for the earths curvature
-
-        #a = math.sin(dlat/2)**2 + \
-        #math.cos(math.radians(lat1)) * \
-        #math.cos(math.radians(lat2)) * \
-        #math.sin(dlon/2)**2
-
-        #Calculate final distance
-        #arcDistance = R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-
-        #return arcDistance
-
 #A class for handling the writing of the CSV file
-
 class CSVWriter:
     
     HEADERS = ["count","latitude","longitude","altitude","fix","satellites","hdop","Note"] #Headers for the CSV file
     
     def __init__(self, folderPath: str): #Constructor creates a new csv file at the path
         
-        #self.fileExists = True
-        
         self.count = 0
-        
-        #self.headers = ["count","latitude","longitude","altitude","fix","satellites","hdop","Note"]
         
         #Set folder path for the duration of the CSVWriter instance and make it if it doesn't exist
         self.folderPath = folderPath
@@ -477,22 +459,14 @@ class CSVWriter:
         
         #Check if file already exists when initialising the class to make sure no data is overwritten
         while os.path.isfile(candidate):
-            
-            #if os.path.isfile(tempFilePath):
                 
             attemptCount += 1
-            
-            #tempFilePath = self.folderPath + "/" + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
+
             candidate = os.path.join(self.folderPath, f"{baseName}_{attemptCount}.csv")
-           
-            #else:
-            
+
         if attemptCount > 0:
-            
-            #tempFilePath = self.folderPath + "/" + fileName[:-4] + "_" + str(attemptCount) + ".csv" #Change file to folderPath/filePath_{count}.csv
+
             print(f"File already exists, exporting instead to {candidate}")
-                
-            #self.fileExists = False;
             
         return candidate
 
@@ -500,9 +474,9 @@ class CSVWriter:
     def createFile(self):
         
         with open(self.filePath, mode='w', newline='', encoding='utf-8') as csvFile:
-            #writer = csv.writer(csvFile)
-            #writer.writerow(self.headers)\
-            csv.writer(csvFile).writerow(self.HEADERS)
+
+           csv.writer(csvFile).writerow(self.HEADERS)
+
 
     #Function to write the provided data to the CSV file
     def write(self, data):
@@ -510,11 +484,26 @@ class CSVWriter:
         print(f"Writing point {self.count + 1} to {self.filePath}")
         
         with open(self.filePath, mode='a', newline='', encoding='utf-8') as csvFile:
-            #writer = csv.writer(csvFile)
-            #writer.writerow(data.strip().split(","))
-            csv.writer(csvFile).writerow(data)
+
+            #Create the writer inside the with block to ensure
+            #it is properly closed after writing
+            writer = csv.writer(csvFile)
+            writer.writerow(data)
+
+            #Force the data to be written to disk immediately
+            csvFile.flush()
+            os.fsync(csvFile.fileno())
             
         self.count += 1
+
+    #Function to start new file name and drops back to 0
+    def resetSession(self):
+
+        self.count = 0
+        self.filePath = self._resolveFilePath()
+        self.createFile()
+
+        print(f"New session initialised. File created at: {self.filePath}")
 
     #Function to provide the current entry count
     def getCount(self) -> int:
@@ -527,7 +516,9 @@ class CSVWriter:
         points = []
         
         if not os.path.isdir(self.folderPath):
+
             print(f"Folder {self.folderPath} does not exist.")
+
             return points
         
         filenames = sorted (
@@ -558,7 +549,8 @@ class CSVWriter:
             
         return points
     
-    
+    #Function to convert single CSV row and with note
+    @staticmethod
     def _rowToPoint(row, filename):
         
         note = (row.get('Note') or row.get('note') or '').strip()
@@ -633,12 +625,6 @@ class TrackMode:
             targetLon
             
         )
-
-            #print("Target Latitude =" + str(targetLat))
-            #print("Target Longitude =" + str(targetLon))
-            #print("Actual Latitude =" + str(gpsData.latitude))
-            #print("Actual Longitude = " + str(gpsData.longitude))
-            #print("Distance between target and actual = " + str(distance))
 
         gpsDataDict = {
             
@@ -740,12 +726,6 @@ class FlaskWebServerClass():
         self.GPSDataOrder = ["latitude", "longitude", "altitude", "fix", "satellites", "hdop"] #Order that the elements should be displayed
         self.GPSDataMeasurement = measurement = ["", "", "", "", "", ""] #A measurement for each element in the order array
 
-
-
-
-
-
-
     def _setupPaths(self):
         app = self.app
         
@@ -785,17 +765,13 @@ class FlaskWebServerClass():
 
         @app.route('/mapGPSData')
         def mapGPSData():
+
             print(self.gpsState.get())
             return MapMode.generateMapModeJSON(self.gpsState.get(), str(self.logger.getCount()))
-            
-            #response = data.get_json()
-            #response['savedPoints'] = self.logger.getCount()
-            #return jsonify(response)
 
         @app.route('/trackGPSData')
         def trackGPSData():
-            #targetLat = request.args.get("targetLat")
-            #targetLon = request.args.get("targetLon")
+
             return TrackMode.generateTrackModeJSON(self.gpsState.get(), request.args.get("targetLat"), request.args.get("targetLon"))
 
         @app.route('/csvWrite', methods = ['POST'])
@@ -808,17 +784,6 @@ class FlaskWebServerClass():
             
             # Read note from request body
             note = request.form.get('note', '')  # Default to empty string if no note provided
-            
-            #dataString = (
-                #str(self.logger.getCount() + 1) + "," + 
-                #str(currentGPSState.latitude) + "," + 
-                #str(currentGPSState.longitude) + "," + 
-                #str(currentGPSState.altitude) + "," + 
-                #tr(currentGPSState.fix) + "," + 
-                #str(currentGPSState.satellites) + "," + 
-                #tr(currentGPSState.hdop) + "," + 
-                #note + "\n"
-            #)
             
             row = [
                 
@@ -835,8 +800,6 @@ class FlaskWebServerClass():
 
             self.logger.write(row)
 
-            #return "OK", 200
-        
             return jsonify({
                 
                 "success": True,
@@ -854,12 +817,7 @@ class FlaskWebServerClass():
         @app.route('/quit', methods=['POST'])
         def quit():
             
-            #import threading
-            #shutdown = threading.Timer(1.0, lambda: os._exit(0))
-            #shutdown.start()
             print("Thankyou for using the Farm Dog GNSS RTK system.")
-            #time.sleep(5)
-            #sys.exit()
             threading.Timer(0.5, lambda: os._exit(0)).start()
             return jsonify({"success": True}), 200
 
@@ -903,10 +861,6 @@ class MainApp:
         
         self.rtk = RTKLogicClass(self.config, self.gps)
         
-        #Setup GPS and RTK logic threads
-        #self.gps = GPSLogicClassTest(self.config, self.gpsState)
-        #self.rtk = RTKLogicClass(self.config, self.gps)
-
         #Setup webserver thread
         self.webServer = FlaskWebServerClass(self.webServerConfig, self.gpsState)
 
@@ -931,14 +885,10 @@ class MainApp:
         else:
             
             print("RTK corrections are disabled in mock GPS mode")
-        
-        #Start rtk logic thread
-        #self.rtk.threadStart()
 
         #Start webserver main task
         print(f"starting web UI on http://{self.webServerConfig.host}:"
               f"{self.webServerConfig.port}"
-              
         )
 
         self.webServer.run()

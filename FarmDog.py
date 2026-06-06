@@ -30,7 +30,7 @@ class Config:
     ntripUser: str = 'admin'
     ntripPass: str = 'admin'
     refreshSec: int = 1
-    useMockGPS: bool = True         # flip to False when the rover Pi is connected
+    useMockGPS: bool = False         # flip to False when the rover Pi is connected
 
 #A class that holds all the web server settings
 @dataclass

@@ -364,7 +364,7 @@ class RTKLogicClass:
                     
                     f"GET /{self.config.mountPoint} HTTP/1.0\r\n"
                     f""User-Agent: NTRIP FarmDog/1.0\r\n"
-                    f"Authorisation: Basic {clean_credentials}\r\n"
+                    f"Authorization: Basic {clean_credentials}\r\n"
                     f"\r\n"
                     
                 )
@@ -632,6 +632,7 @@ class TrackMode:
             "longitude": gpsData.longitude,
             "distance": distance,
             "azimuth": azimuth
+            "fix" : gpsData.fix
             
         }
 

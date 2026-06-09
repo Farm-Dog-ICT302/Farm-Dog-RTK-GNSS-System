@@ -25,7 +25,7 @@ The system consists of two components:
     - ABS IP66 enclosure
     - Power bank or fixed power supply
 
-<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/BaseStation.jpeg" width="55%" alt="BaseStation Image">
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/BaseStation.jpeg" width="70%" alt="BaseStation Image">
 
 
 ### Rover
@@ -36,7 +36,7 @@ The system consists of two components:
     - ABS IP66 enclosure
     - Power bank
     
-<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg" width="55%" alt="Rover Image">
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg" width="70%" alt="Rover Image">
 
 
 ### Network
@@ -64,8 +64,14 @@ The system consists of two components:
 
 ## FarmDog Interface
 
-![Main Menu](images/screenshots/Screenshot Menu.png)
+#### Menu
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/screenshots/Screenshot Menu.png" width="55%" alt="Main Menu">
 
+#### Map Mode
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/screenshots/Screenshot MapMode.png" width="55%" alt="Map Mode">
+
+#### Find Mode
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/screenshots/Screenshot FindMode.png" width="55%" alt="Find Mode">
 
 # Installation & Setup
 This repository contains both the GNSS data processing backend and the Web GUI interface. 
@@ -123,7 +129,7 @@ http://[IP ADDRESS]:5000
 
 **Supervisor:** David MURRAY
 
-**Client:** Terry Koziniec
+**Client:** Terry KOZINIEC
 
 ## Acknowledgements
 

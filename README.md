@@ -2,6 +2,7 @@
 The system consists of two components:
 
 • A Base Station that receives GNSS satellite data and generates RTK correction data.
+
 • A Rover that receives these RTK corrections and combines them with its own GNSS measurements to achieve centimetre-level positioning accuracy.
 
 ## Features
@@ -73,38 +74,36 @@ This repository contains both the GNSS data processing backend and the Web GUI i
 * Base Station Raspberry Pi running ***RTKBase*** [RTKBase setup guide](https://github.com/Stefal/rtkbase) for installation.
 * Python 3.10+ installed.
 
-### How to Install and Run the FarmDog App
+## How to Install and Run the FarmDog App
 
 If you only want to deploy the Python processing engine to your rover hardware, follow these steps to download and setup FarmDog Python program and Web GUI:
 
 
-# 1. Install the FarmDog-App
+##### 1. Install the FarmDog-App
 ```
 git clone https://github.com/Farm-Dog-ICT302/FarmDog-App.git
 ```
 
-# 2. Navigate into the application directory
+##### 2. Navigate into the application directory
 ```
 cd FarmDog-App
 ```
 
-# 3. Run the installation script (installs Flask and other dependencies)
+##### 3. Run the installation script (installs Flask and other dependencies)
 ```
 chmod +x install.sh
 ./install.sh
 ```
 
-# 4. Start the Flask Web GUI and Python backend
+##### 4. Start the Flask Web GUI and Python backend
 ```
 ./startserver.sh
 ```
 
-# 5. Navigate to Web Browser on any device on the same network
+##### 5. Navigate to Web Browser on any device on the same network
 ```
 http://[IP ADDRESS]:5000
 ```
-
-
 
 ## Program Versions
 
@@ -120,9 +119,10 @@ http://[IP ADDRESS]:5000
     - Mock GPS source for offline development when hardware is unavailable
 
 
-## Team - ICT302 Team IT01 (S1 2026)
+## Team FarmDog - ICT302 Team IT01 (Semester 1 - 2026)
 
 **Supervisor:** David MURRAY
+
 **Client:** Terry Koziniec
 
 ## Acknowledgements

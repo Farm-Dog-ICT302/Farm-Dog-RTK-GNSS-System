@@ -15,12 +15,13 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - Raspberry Pi 4B 4GB
     - u-blox ZED-F9P GNSS module
     - GNSS antenna
-    - Tripod Height - 2metres (used for field testing)
+    - Tripod Height - 2 metres (used for field testing)
     - ABS IP66 enclosure
     - Power bank or fixed power supply
     - Wi-Fi router (shared) - GL-MT3000
 
-![Base Station](https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/blob/main/images/hardware_images/BaseStation.jpeg)
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/BaseStation.jpeg" width="40%" alt="BaseStation Image">
+
 
 ### Rover
     - Raspberry Pi 4B 4GB
@@ -30,7 +31,8 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - ABS IP66 enclosure
     - Power bank
     
-![Rover Image](https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg)
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg" width="40%" alt="Rover Image">
+
 
 ### Network
     - GL-MT3000 portable Wi-Fi router

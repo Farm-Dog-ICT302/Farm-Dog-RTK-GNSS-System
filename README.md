@@ -132,11 +132,11 @@ http://[IP ADDRESS]:5000
 **Client:** Terry KOZINIEC
 
 ***Students*** 
-Clark Carpentero 
-Tim Fausten
-Vo Thu
-Flynn McAlpine-Monkhouse
-Daniel Scott 
+Clark Carpentero, 
+Tim Fausten,
+Vo Thu,
+Flynn McAlpine-Monkhouse,
+Daniel Scott, and 
 Aldo Keo
 
 ## Acknowledgements

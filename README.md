@@ -1,5 +1,5 @@
 # Farm-Dog-RTK-GNSS
-This respository contains information about a setup of an RTK GNSS Surveying and Positioning System built using the u-blox ZED-F9P module, RTKBase, PyGPSClient and a Python script to log positional data.
+This repository contains information about a setup of an RTK GNSS Surveying and Positioning System built using the u-blox ZED-F9P module, RTKBase, PyGPSClient and a Python script to log positional data.
 
 The system consists of 2 components - a base station which receives GPS data from the satellites and calculates the correction offset and a rover which receives these correction offsets and calculate these with its own GPS setellite data to achieve centimetre-level accuracy.
 
@@ -20,7 +20,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - Power bank or fixed power supply
     - Wi-Fi router (shared) - GL-MT3000
 
-<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/BaseStation.jpeg" width="40%" alt="BaseStation Image">
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/BaseStation.jpeg" width="55%" alt="BaseStation Image">
 
 
 ### Rover
@@ -31,7 +31,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - ABS IP66 enclosure
     - Power bank
     
-<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg" width="40%" alt="Rover Image">
+<img src="https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg" width="55%" alt="Rover Image">
 
 
 ### Network
@@ -45,8 +45,48 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
 
 ### Software - Rover
     - farmdog.py (this program introduce as solution)
-    - PyGPSClient (graphical monitoring)
+    - PyGPSClient (graphical dianostics)
     - Raspberry Pi OS
+
+
+
+# Installation & Setup
+This repository contains both the GNSS data processing backend and the Web GUI interface. 
+
+### Prerequisites
+* A Raspberry Pi running ***RTKBase*** [RTKBase setup guide](https://github.com/Stefal/rtkbase) for hardware installation).
+* Python 3.10+ installed.
+
+### How to Install and Run the FarmDog App
+
+If you only want to deploy the Python processing engine to your rover hardware, follow these steps to download and setup FarmDog Python program and Web GUI:
+
+```bash
+# 1. Clone the entire repository
+git clone [https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System.git](https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System.git)
+
+# 2. Navigate into the application directory
+cd Farm-Dog-RTK-GNSS-System/farmdog-app
+
+# 3. Run the installation script (installs Flask and other dependencies)
+chmod +x install.sh
+./install.sh
+
+# 4. Start the Flask Web GUI and Python backend
+./startserver.sh
+```
+
+##### Clone the repository and navigate to the backend
+```
+git clone [https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System.git](https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System.git)
+cd Farm-Dog-RTK-GNSS-System/src/backend
+```
+
+##### Install dependencies
+```
+pip install -r requirements.txt
+python main.py 
+```
 
 ## Program Versions
 

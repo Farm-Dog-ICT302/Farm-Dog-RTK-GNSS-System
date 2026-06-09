@@ -27,6 +27,8 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - Tripod Height - 2metres
     - ABS IP66 enclosure
     - Power bank
+    
+![alt text] (https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/blob/main/images/hardware_images/Rover2.jpeg)
 
 ### Network
     - GL-MT3000 portable Wi-Fi router

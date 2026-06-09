@@ -20,6 +20,8 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - Power bank or fixed power supply
     - Wi-Fi router (shared) - GL-MT3000
 
+![Base Station](https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/blob/main/images/hardware_images/BaseStation.jpeg)
+
 ### Rover
     - Raspberry Pi 4B 4GB
     - u-blox ZED-F9P GNSS module
@@ -28,7 +30,7 @@ corrections from a base station via NTRIP, and records sub-2.5cm accurate coordi
     - ABS IP66 enclosure
     - Power bank
     
-![alt text] (https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/blob/main/images/hardware_images/Rover2.jpeg)
+![Rover Image](https://raw.githubusercontent.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System/main/images/hardware_images/Rover2.jpeg)
 
 ### Network
     - GL-MT3000 portable Wi-Fi router

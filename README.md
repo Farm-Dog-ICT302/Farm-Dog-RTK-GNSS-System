@@ -64,7 +64,7 @@ The system consists of two components:
 
 ## FarmDog Interface
 
-![Main Menu](images/screenshots/main-menu.png)
+![Main Menu](images/screenshots/Screenshot Menu.png)
 
 
 # Installation & Setup

@@ -165,7 +165,7 @@ Farm Dog application repository directly from GitHub:
 
 - **Step 3:** Execute the initialization script to start the local server and run the application: 
 
-## `./startserver.s` 
+ `./startserver.s` 
 
 - **Step 4:** (Optional Diagnostic) You can optionally install a graphical user interface tool called PyGPSClient to monitor the raw GNSS receiver data directly. To install it, run the following command: 
 
@@ -228,23 +228,23 @@ https://github.com/morrownr/88x2bu-20210702
 
 command: 
 
-**`o`** `mkdir -p ~/src` 
+`mkdir -p ~/src` 
 
 - **Step 6:** Move to the newly created directory: 
 
-`o cd ~/src` 
+`cd ~/src` 
 
 - **Step 7:** Download the driver from the GitHub repository using the `git clone` command: 
 
-`o git clone https://github.com/morrownr/88x2bu-20210702.git` 
+`git clone https://github.com/morrownr/88x2bu-20210702.git` 
 
 - **Step 8:** Move to the newly created driver directory: 
 
-`o cd ~/src/88x2bu-20210702` 
+`cd ~/src/88x2bu-20210702` 
 
 - **Step 9:** Run the installation script with this command: 
 
-`o sudo ./install-driver` 
+`sudo ./install-driver` 
 
 - **Step 10:** After the driver has been successfully installed, you will be asked 
 

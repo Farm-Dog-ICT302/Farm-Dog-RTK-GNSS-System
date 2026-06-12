@@ -121,9 +121,9 @@ The initial hardware installation of the Farm Dog system is explained in the Ins
 
 The rover has Raspberry Pi OS and the python program installed on its Micro SD card which contains the main Farm Dog program the user interacts with. This program can be found in the GitHub repository so it can be redownloaded in the case of the equipment being damaged or for project expansion in the case of the user wanting to add new functionality to the Farm Dog projec 
 
-## The Farm Dog GitHub Repository can be found here: 
+The Farm Dog GitHub Repository can be found here: 
 
-## https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System 
+https://github.com/Farm-Dog-ICT302/Farm-Dog-RTK-GNSS-System 
 
 ## 5.2 Getting started: User Interface Guide 
 
@@ -384,7 +384,7 @@ Now activate the binary file and run the python program:
 
 Before starting the application, you must configure the Rover, so it knows exactly where to look for the Base Station’s correction data. 
 
-## **1. Open the Configuration File** 
+**1. Open the Configuration File** 
 
 While connected to the Rover via the Putty SSH terminal, navigate to the application folder and open the Python script using the nano text editor: 
 
@@ -392,7 +392,7 @@ While connected to the Rover via the Putty SSH terminal, navigate to the applica
 
 `sudo nano FarmDog.py` 
 
-## **2. Update the Credentials** 
+**2. Update the Credentials** 
 
 Change the credentials for the Rover to communicate with the Base Station. Enter the following parameters to allow correction data to flow: 
 
@@ -412,11 +412,11 @@ Change the credentials for the Rover to communicate with the Base Station. Enter
 
 In the event that scripts become corrupted or the Raspberry Pi board needs to be replaced, follow these steps to set up the Farm Dog software on a fresh Raspberry Pi. 
 
-## **1. Connect to Local Wi-Fi** 
+**1. Connect to Local Wi-Fi** 
 
 Ensure your device is connected to the same local Wi-Fi network as the Base Station and Rover. You will need an active internet connection to download the necessary dependencies. 
 
-## **2. Download the Python Script** 
+**2. Download the Python Script** 
 
 Open a Putty terminal window connected to the Rover and clone the software repository directly from GitHub by entering the following command: 
 
@@ -424,11 +424,11 @@ Open a Putty terminal window connected to the Rover and clone the software repos
 
 `https://github.com/Farm-Dog-ICT302/FarmDog-App.git` 
 
-## **3. Launch the Automatic Installation Script** 
+**3. Launch the Automatic Installation Script** 
 
 Once the repository is cloned, navigate into the folder, grand execution permissions to the install script, and run it. _(Note: This will automatically install any missing dependencies and start the web server upon completion)._ 
 
-## 8.2.4Automatic installation script 
+## 8.2.4 Automatic installation script 
 
 **NOTE:** Internet  is  always  required,  as  this  will  allow  the installation of missing dependencies. 
 
@@ -442,7 +442,7 @@ Give execute permissions for “install.sh” script and after finishing it will
 
 `./install.sh` 
 
-## **4. Future Restarts** 
+**4. Future Restarts** 
 
 If you ever need to manually restart the program after this fresh installation, simply enter: 
 
@@ -452,7 +452,7 @@ If you ever need to manually restart the program after this fresh installation, 
 
 If you prefer to start the application manually, or if you need to bypass the automatic script for troubleshooting, you can run the Python environment directly. 
 
-## **1. Activate and Run** 
+**1. Activate and Run** 
 
 In the Putty terminal, enter the following commands one by one to launch the program manually: 
 
@@ -464,11 +464,11 @@ Now activate the binary file and run the python program:
 
 `python3 Farm Dog.py` 
 
-## **2. Access the Web GUI** 
+**2. Access the Web GUI** 
 
 Ther  terminal  will  output  a  local  IP address  and  port number  (e.g., http://[ROVER_IP_ADDRESS]:5000).  Copy  this exact link, open a new tab in your web browser, and paste it into the address bar. 
 
-## **3. Setup Complete** 
+**3. Setup Complete** 
 
 The Farm Dog interface will load on your screen, indicating that the system is fully operational and receiving correction data. You can now begin surveying.  
 
@@ -482,19 +482,19 @@ Find Mode allows the user to physically navigate to a specific, pre-determined l
 
 ## **How to Use Find Mode:** 
 
-## **1. Enter Coordinates** 
+**1. Enter Coordinates** 
 
 Load your desired destination by entering the exact X and Y coordinates (Latitude and Longitude). You can either manually type these values into the program or copy them from a previously generated CSV file. 
 
-## **2. Start Navigating** 
+**2. Start Navigating** 
 
 Click the **Find Target** button to lock in the coordinates. 
 
-## **3. Follow the Interface** 
+**3. Follow the Interface** 
 
 The web GUI will update in real-time, displaying critical navigation data to guide you. This includes your current coordinates, the exact distance remaining to the target, and the compass direction you need to travel. 
 
-## **4. Arrival** 
+**4. Arrival** 
 
 Continue moving according to the on-screen directions. Once your Rover reaches within 10 centimetres of the destination, the 
 
@@ -514,7 +514,7 @@ When active, the Map Mode interface displays the following real-time
 
 telemetry for the Rover’s current position: 
 
-## **`o` Latitude and Longitude** 
+** Latitude and Longitude** 
 
 - Altitude 
 
@@ -580,23 +580,23 @@ Use the following guide to assess your HDOP reading in the field:
 
 - **> 5:** Poor (consider waiting for better satellite visibility or moving away from obstruction) 
 
-## 10   Error Handling & Recovery 
+## 10 Error Handling & Recovery 
 
 The Farm Dog software is designed with built-in safeguards to handle several major errors gracefully, ensuring the system does not crash during active fieldwork. The system currently handles the following errors: 
 
-## **`o` Missing GPS Data (CSV Export)** 
+** Missing GPS Data (CSV Export)** 
 
 If a user attempts to save a plot point to the CSV file without a valid GPS lock or data, the system will prevent the save and return a JSON 400 error 
 
-## **`o` RTK Stream Connection Lost** 
+** RTK Stream Connection Lost** 
 
 If the connection to the Base Station’s RTK stream fails or drops mid-session, the system will securely log the error and automatically enter a retry loop, continually attempting to reconnect after a shirt delay. 
 
-## **`o` NMEA Parsing Error** 
+** NMEA Parsing Error** 
 
 If the Rover receives corrupted or unreadable raw GPS data (NMEA sentences) form the satellites, it will safely skip the faulty line of data and seamlessly continue reading the next one. 
 
-## **`o` Invalid Input Type** 
+** Invalid Input Type** 
 
 If incorrect or unreadable data type are entered into the system (such as invalid coordinate formats during Track/Mode), the application will reject the input and return a 400 Error. 
 

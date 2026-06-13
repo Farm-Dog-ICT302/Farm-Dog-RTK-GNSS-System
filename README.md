@@ -127,17 +127,18 @@ http://[IP ADDRESS]:5000
 
 ## Team FarmDog - ICT302 Team IT01 (Semester 1 - 2026)
 
-**Supervisor:** David MURRAY
+**Supervisor:** David Murray
 
-**Client:** Terry KOZINIEC
+**Client:** Terry Koziniec
 
 ***Students*** 
-Clark Carpentero, 
-Tim Fausten,
-Vo Thu,
-Flynn McAlpine-Monkhouse,
-Daniel Scott, and 
-Aldo Keo
+* Clark Carpentero - **PROJECT Coordinator**
+* Tim Fausten - **Librarian**
+* Vo Thu - **Software Coordinator**
+* Pema Selden - **Security Coordinator**
+* Flynn McAlpine-Monkhouse - **Secretary**
+* Daniel Scott - **Frontend Web GUI**
+* Aldo Keo - **Hardware and Communications Officer**
 
 ## Acknowledgements
 

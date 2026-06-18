@@ -314,7 +314,7 @@ To enable VNC and provide the system with a graphical user interface for remote 
 
 - **Step 1:** Enter the following command into your active SSH Terminal: 
 
-`o sudo raspi-config` 
+`sudo raspi-config` 
 
 - **Step 2:** This command opens the Raspberry Pi Software Configuration 
 
@@ -348,13 +348,13 @@ Additional software was installed to assist the team throughout the testing phas
 
 - **Step 4:** Add or modify the settings inside the configuration file to match the following parameters: 
 
-`o [global] workgroup = WORKGROUP server string = Rover RTK Station server role = standalone server og file = /var/log/samba/log.%m max log size = 1000 logging = file panic  action  =  /usr/share/samba/panic-action %d` 
+`[global] workgroup = WORKGROUP server string = Rover RTK Station server role = standalone server og file = /var/log/samba/log.%m max log size = 1000 logging = file panic  action  =  /usr/share/samba/panic-action %d` 
 
 `# Security settings security = user map to guest = Bad User` 
 
  `[RoverHome] comment = Share for Home Directory path = /home/user-rover/ browseable = yes read only = yes guest ok = no alid users = user-rover force user = user-rover` 
 
-`o [RoverShare] comment = Farm Dog RTK Final Test Build path = /home/user-rover/Downloads/Farm-Dog-RTKGNSS-System-Final-Test-Buildv3 browseable = yes read only = no guest ok = no valid users = user-rover force user = user-rover` 
+`[RoverShare] comment = Farm Dog RTK Final Test Build path = /home/user-rover/Downloads/Farm-Dog-RTKGNSS-System-Final-Test-Buildv3 browseable = yes read only = no guest ok = no valid users = user-rover force user = user-rover` 
 
 - **Step 5:** Save the configuration file by pressing **CTRL+O** , press **Enter** to confirm the file name, and then press **CTRL+X** to exit the text editor. 
 
@@ -362,19 +362,19 @@ Additional software was installed to assist the team throughout the testing phas
 
 - **Step  1:** Update  and  refresh  the  Base  Station  system  packages  by executing the following command: 
 
-`o sudo apt update && sudo apt upgrade -y` 
+`sudo apt update && sudo apt upgrade -y` 
 
 - **Step 2:** Install the required Samba NAS packages to enable network file 
 
 sharing on the Base Station: 
 
-`o sudo apt install` 
+`sudo apt install` 
 
 ## 11.3 SETTING UP SAMBA NAS 
 
 - **Step 1:** To install the required Samba NAS packages and enable network file sharing, execute the following command: 
 
-`o sudo apt install samba samba-common-bin -y` 
+`sudo apt install samba samba-common-bin -y` 
 
 
 ## 12 HARDWARE ASSEMBLY 
